@@ -13,12 +13,13 @@ const convertGoogleDriveLink = (viewLink: string): string => {
   // Extract file ID from the Google Drive URL
   const fileIdMatch = viewLink.match(/\/d\/(.+?)\/view/);
   if (fileIdMatch && fileIdMatch[1]) {
-    return `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+    // Use a more reliable format for audio playback
+    return `https://docs.google.com/uc?export=download&id=${fileIdMatch[1]}`;
   }
   return viewLink;
 };
 
-// Podcast data with Google Drive links
+// Podcast data with Google Drive links and updated durations
 export const getPodcasts = (): Podcast[] => {
   return [
     {
@@ -26,7 +27,7 @@ export const getPodcasts = (): Podcast[] => {
       title: "AI Unit 1",
       description: "Introduction to Artificial Intelligence and foundational concepts",
       audioUrl: convertGoogleDriveLink("https://drive.google.com/file/d/1B-yn8tYw9pzobCjwcp02ddB07Kolusgy/view?usp=drive_link"),
-      duration: "14:32",
+      duration: "24:15",
       category: "AI Fundamentals"
     },
     {
@@ -34,7 +35,7 @@ export const getPodcasts = (): Podcast[] => {
       title: "AI Unit 2",
       description: "Machine Learning algorithms and approaches",
       audioUrl: convertGoogleDriveLink("https://drive.google.com/file/d/1HmcHYEjnJhUFwEXG6932ECO0IqJB9jpT/view?usp=drive_link"),
-      duration: "16:45",
+      duration: "21:38",
       category: "Machine Learning"
     },
     {
@@ -42,7 +43,7 @@ export const getPodcasts = (): Podcast[] => {
       title: "AI Unit 3",
       description: "Neural Networks and Deep Learning fundamentals",
       audioUrl: convertGoogleDriveLink("https://drive.google.com/file/d/1mbdgI0rHio7iWsoxwHGn3ZSXdPoo73e_/view?usp=drive_link"),
-      duration: "18:20",
+      duration: "28:50",
       category: "Deep Learning"
     },
     {
@@ -50,7 +51,7 @@ export const getPodcasts = (): Podcast[] => {
       title: "AI Unit 4",
       description: "Computer Vision and Natural Language Processing",
       audioUrl: convertGoogleDriveLink("https://drive.google.com/file/d/1E6CVrXOwSSwsmwcCHWpAWlID1t5PCflD/view?usp=drive_link"),
-      duration: "15:10",
+      duration: "25:22",
       category: "Applied AI"
     },
     {
@@ -58,7 +59,7 @@ export const getPodcasts = (): Podcast[] => {
       title: "AI Unit 5",
       description: "Ethics in AI and future implications",
       audioUrl: convertGoogleDriveLink("https://drive.google.com/file/d/1bS_pUijuYTgXV8LOf7juSXVD_8BCc5B0/view?usp=drive_link"),
-      duration: "12:55",
+      duration: "22:45",
       category: "AI Ethics"
     }
   ];
