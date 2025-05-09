@@ -1,8 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Gauge } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import Waveform from './Waveform';
 import { toast } from '@/components/ui/sonner';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AudioPlayerProps {
   src: string;
@@ -23,6 +30,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1);
   
   useEffect(() => {
     const audio = audioRef.current;
@@ -48,15 +56,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     audio.addEventListener('timeupdate', setAudioTime);
     audio.addEventListener('error', handleError);
     
-    // Set initial volume
+    // Set initial volume and playback rate
     audio.volume = volume;
+    audio.playbackRate = playbackRate;
     
     return () => {
       audio.removeEventListener('loadeddata', setAudioData);
       audio.removeEventListener('timeupdate', setAudioTime);
       audio.removeEventListener('error', handleError);
     };
-  }, [audioRef, volume, setIsPlaying]);
+  }, [audioRef, volume, playbackRate, setIsPlaying]);
   
   const togglePlay = () => {
     if (audioRef.current) {
@@ -105,6 +114,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       }
     }
   };
+
+  const handlePlaybackRateChange = (value: string) => {
+    const rate = parseFloat(value);
+    setPlaybackRate(rate);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = rate;
+    }
+  };
   
   const formatTime = (time: number) => {
     if (isNaN(time)) return '0:00';
@@ -121,22 +138,43 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">{title}</h3>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleMute}
-              className="p-2 rounded-full hover:bg-white/5 transition-colors"
-            >
-              {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-            </button>
-            <div className="w-20">
-              <Slider
-                defaultValue={[0.7]}
-                value={[volume]}
-                max={1}
-                step={0.01}
-                onValueChange={handleVolumeChange}
-                className="h-1"
-              />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Gauge size={18} className="text-podcast-subtle" />
+              <Select
+                value={playbackRate.toString()}
+                onValueChange={handlePlaybackRateChange}
+              >
+                <SelectTrigger className="w-20 h-8">
+                  <SelectValue placeholder="1x" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0.5">0.5x</SelectItem>
+                  <SelectItem value="0.75">0.75x</SelectItem>
+                  <SelectItem value="1">1x</SelectItem>
+                  <SelectItem value="1.25">1.25x</SelectItem>
+                  <SelectItem value="1.5">1.5x</SelectItem>
+                  <SelectItem value="2">2x</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleMute}
+                className="p-2 rounded-full hover:bg-white/5 transition-colors"
+              >
+                {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </button>
+              <div className="w-20">
+                <Slider
+                  defaultValue={[0.7]}
+                  value={[volume]}
+                  max={1}
+                  step={0.01}
+                  onValueChange={handleVolumeChange}
+                  className="h-1"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -169,7 +207,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
           />
         </div>
         
-        <div className="flex items-center justify-center gap-6">
+        <div className="flex items-center justify-center gap-4">
           <button
             className="p-2 rounded-full hover:bg-white/5 transition-colors text-podcast-subtle"
             onClick={() => { if (audioRef.current) audioRef.current.currentTime = 0; }}

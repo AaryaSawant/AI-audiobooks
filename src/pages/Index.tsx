@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
@@ -17,7 +16,24 @@ const Index = () => {
   // Pre-load the audio element when a podcast is selected
   useEffect(() => {
     if (selectedPodcast && audioRef.current) {
+      // Reset the audio element
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
       audioRef.current.load();
+      
+      // Add error handling for audio loading
+      const handleError = (e: any) => {
+        console.error("Audio loading error:", e);
+        toast.error("Failed to load audio file. Please try again.");
+        setIsPlaying(false);
+      };
+
+      audioRef.current.addEventListener('error', handleError);
+      return () => {
+        if (audioRef.current) {
+          audioRef.current.removeEventListener('error', handleError);
+        }
+      };
     }
   }, [selectedPodcast]);
 
