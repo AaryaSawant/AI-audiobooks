@@ -22,7 +22,7 @@ const Waveform: React.FC<WaveformProps> = ({ isPlaying }) => {
   });
 
   return (
-    <div className="flex items-end h-8 gap-[1px]">
+    <div className="flex items-end h-10 gap-[1px]">
       {bars.map((bar, index) => (
         <div
           key={index}
@@ -33,6 +33,7 @@ const Waveform: React.FC<WaveformProps> = ({ isPlaying }) => {
             '--speed': isPlaying ? '0.8s' : '0s',
             opacity: isPlaying ? 1 : 0.4,
             backgroundColor: isPlaying ? 'var(--podcast-accent-color, #8B5CF6)' : 'var(--podcast-subtle-color, #9CA3AF)',
+            transition: 'height 0.2s ease, opacity 0.3s ease, background-color 0.3s ease',
           } as React.CSSProperties}
         ></div>
       ))}
