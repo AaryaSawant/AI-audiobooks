@@ -13,8 +13,8 @@ const convertGoogleDriveLink = (viewLink: string): string => {
   // Extract file ID from the Google Drive URL
   const fileIdMatch = viewLink.match(/\/d\/(.+?)\/view/);
   if (fileIdMatch && fileIdMatch[1]) {
-    // Use a more reliable format for audio playback
-    return `https://docs.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+    // Use the direct download link format that works better with audio elements
+    return `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
   }
   return viewLink;
 };

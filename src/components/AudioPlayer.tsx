@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
@@ -38,7 +37,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       setCurrentTime(audio.currentTime);
     };
 
-    const handleError = (e: ErrorEvent) => {
+    const handleError = (e: any) => {
       console.error("Audio error:", e);
       toast.error("There was an error playing this audio. Please try again.");
       setIsPlaying(false);
@@ -47,7 +46,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     // Add event listeners
     audio.addEventListener('loadeddata', setAudioData);
     audio.addEventListener('timeupdate', setAudioTime);
-    audio.addEventListener('error', handleError as EventListener);
+    audio.addEventListener('error', handleError);
     
     // Set initial volume
     audio.volume = volume;
@@ -55,7 +54,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     return () => {
       audio.removeEventListener('loadeddata', setAudioData);
       audio.removeEventListener('timeupdate', setAudioTime);
-      audio.removeEventListener('error', handleError as EventListener);
+      audio.removeEventListener('error', handleError);
     };
   }, [audioRef, volume, setIsPlaying]);
   
@@ -63,13 +62,17 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
+        setIsPlaying(false);
       } else {
-        audioRef.current.play().catch(error => {
-          console.error("Error playing audio:", error);
-          toast.error("Could not play this podcast. Please try again later.");
-        });
+        audioRef.current.play()
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch(error => {
+            console.error("Error playing audio:", error);
+            toast.error("Could not play this podcast. Please try again later.");
+          });
       }
-      setIsPlaying(!isPlaying);
     }
   };
   

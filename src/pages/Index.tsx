@@ -1,17 +1,25 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import AudioPlayer from '@/components/AudioPlayer';
 import PodcastCard from '@/components/PodcastCard';
 import { getPodcasts, Podcast } from '@/services/podcastService';
 import Waveform from '@/components/Waveform';
+import { toast } from '@/components/ui/sonner';
 
 const Index = () => {
   const [podcasts] = useState<Podcast[]>(getPodcasts);
   const [selectedPodcast, setSelectedPodcast] = useState<Podcast | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Pre-load the audio element when a podcast is selected
+  useEffect(() => {
+    if (selectedPodcast && audioRef.current) {
+      audioRef.current.load();
+    }
+  }, [selectedPodcast]);
 
   const handlePodcastSelect = (podcast: Podcast) => {
     // If selecting the same podcast that's already playing, just toggle play/pause
@@ -21,8 +29,12 @@ const Index = () => {
           audioRef.current.pause();
           setIsPlaying(false);
         } else {
-          audioRef.current.play().catch(error => console.error("Error playing audio:", error));
-          setIsPlaying(true);
+          audioRef.current.play()
+            .then(() => setIsPlaying(true))
+            .catch(error => {
+              console.error("Error playing audio:", error);
+              toast.error("Could not play this podcast. Please try again later.");
+            });
         }
       }
       return;
@@ -32,13 +44,17 @@ const Index = () => {
     setSelectedPodcast(podcast);
     setIsPlaying(false);
     
-    // We'll start playing after the audio element loads the new source
+    // Give the audio element time to update with the new source
     setTimeout(() => {
       if (audioRef.current) {
-        audioRef.current.play().catch(error => console.error("Error playing audio:", error));
-        setIsPlaying(true);
+        audioRef.current.play()
+          .then(() => setIsPlaying(true))
+          .catch(error => {
+            console.error("Error playing audio:", error);
+            toast.error("Could not play this podcast. Please try again later.");
+          });
       }
-    }, 100);
+    }, 300);
   };
 
   return (
@@ -47,7 +63,8 @@ const Index = () => {
       <audio 
         ref={audioRef} 
         src={selectedPodcast?.audioUrl} 
-        onEnded={() => setIsPlaying(false)} 
+        onEnded={() => setIsPlaying(false)}
+        preload="auto"
         hidden
       />
       
