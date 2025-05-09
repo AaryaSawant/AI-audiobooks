@@ -101,9 +101,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const progress = duration ? (currentTime / duration) * 100 : 0;
+
   return (
-    <div className="glass-card rounded-xl p-4 w-full">
-      <div className="flex flex-col gap-4">
+    <div className="glass-card rounded-xl p-6 w-full">
+      <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">{title}</h3>
           <div className="flex items-center gap-2">
@@ -126,6 +128,34 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
           </div>
         </div>
         
+        <div className="flex flex-col">
+          <div className="relative w-full h-1 bg-white/10 rounded-full overflow-hidden">
+            <div 
+              className="absolute top-0 left-0 h-full bg-gradient-to-r from-podcast-accent to-podcast-highlight"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+          
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-podcast-subtle">{formatTime(currentTime)}</span>
+            <span className="text-xs text-podcast-subtle">{formatTime(duration)}</span>
+          </div>
+        </div>
+        
+        <div className="relative">
+          <div className="absolute -top-4 left-0 right-0">
+            <Waveform isPlaying={isPlaying} />
+          </div>
+          <Slider
+            defaultValue={[0]}
+            value={[currentTime]}
+            max={duration || 1}
+            step={0.1}
+            onValueChange={handleTimeChange}
+            className="h-1 opacity-0"
+          />
+        </div>
+        
         <div className="flex items-center justify-center gap-6">
           <button
             className="p-2 rounded-full hover:bg-white/5 transition-colors text-podcast-subtle"
@@ -136,7 +166,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
           
           <button
             onClick={togglePlay}
-            className="p-3 rounded-full bg-podcast-accent hover:bg-podcast-accent/90 text-white transition-colors flex items-center justify-center"
+            className="p-4 rounded-full bg-podcast-accent hover:bg-podcast-accent/90 text-white transition-colors flex items-center justify-center"
           >
             {isPlaying ? <Pause size={22} /> : <Play size={22} />}
           </button>
@@ -147,24 +177,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
           >
             <SkipForward size={20} />
           </button>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-podcast-subtle">{formatTime(currentTime)}</span>
-          <div className="flex-1 relative">
-            <Slider
-              defaultValue={[0]}
-              value={[currentTime]}
-              max={duration || 1}
-              step={0.1}
-              onValueChange={handleTimeChange}
-              className="h-1"
-            />
-            <div className="absolute -top-4 left-0 right-0">
-              <Waveform isPlaying={isPlaying} />
-            </div>
-          </div>
-          <span className="text-xs text-podcast-subtle">{formatTime(duration)}</span>
         </div>
       </div>
     </div>

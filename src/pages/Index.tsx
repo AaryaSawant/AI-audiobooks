@@ -1,10 +1,11 @@
+
 import React, { useState, useRef } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import AudioPlayer from '@/components/AudioPlayer';
-import AudioVisualizer from '@/components/AudioVisualizer';
 import PodcastCard from '@/components/PodcastCard';
 import { getPodcasts, Podcast } from '@/services/podcastService';
+import Waveform from '@/components/Waveform';
 
 const Index = () => {
   const [podcasts] = useState<Podcast[]>(getPodcasts);
@@ -56,13 +57,18 @@ const Index = () => {
         <div className="container px-4 mx-auto py-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold mb-4">AI Lecture Podcasts</h2>
-              <div className="space-y-3">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">AI Lecture Podcasts</h2>
+                <span className="text-xs text-podcast-subtle bg-podcast-card-bg px-2 py-1 rounded-full">{podcasts.length} episodes</span>
+              </div>
+              <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin">
                 {podcasts.map((podcast) => (
                   <PodcastCard
                     key={podcast.id}
                     title={podcast.title}
                     description={podcast.description}
+                    duration={podcast.duration}
+                    category={podcast.category}
                     isActive={selectedPodcast?.id === podcast.id}
                     onClick={() => handlePodcastSelect(podcast)}
                   />
@@ -71,8 +77,24 @@ const Index = () => {
             </div>
             
             <div className="md:col-span-2">
-              <div className="h-[300px] mb-6 glass-card rounded-xl overflow-hidden">
-                <AudioVisualizer isPlaying={isPlaying} audioElement={audioRef.current} />
+              <div className="glass-card rounded-xl p-8 mb-6 bg-gradient-to-br from-podcast-card-bg via-podcast-card-bg to-podcast-accent/5">
+                <div className="flex flex-col items-center text-center">
+                  <h2 className="text-2xl font-bold mb-3">
+                    <span className="text-gradient">Audio Revision Hub</span>
+                  </h2>
+                  <p className="text-podcast-subtle mb-6 max-w-md">
+                    Listen to concise summaries of your AI lecture notes to aid with revision and learning.
+                  </p>
+                  <div className="w-full max-w-md h-12 bg-podcast-card-bg/50 rounded-lg overflow-hidden flex items-center justify-center">
+                    {isPlaying ? (
+                      <div className="w-3/4">
+                        <Waveform isPlaying={isPlaying} />
+                      </div>
+                    ) : (
+                      <p className="text-podcast-subtle">Select a podcast to start listening</p>
+                    )}
+                  </div>
+                </div>
               </div>
               
               {selectedPodcast ? (
